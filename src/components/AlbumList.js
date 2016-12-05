@@ -1,69 +1,31 @@
-import React from 'react';
-import { Text, View, Image, Linking } from 'react-native';
-import Card from './Card';
-import CardSection from './CardSection';
-import Button from './Button';
+// Import libraries for making a component
 
-const AlbumDetail = ({ album }) => {
-  const { title, artist, thumbnail_image, image, url } = album;
-  const { thumbnailStyle,
-          headerContentStyle,
-          thumbnailContainerStyle,
-          headerTextStyle,
-          imageStyle } = styles; 
-  return (
-    <Card>
-      <CardSection>
-        <View style={thumbnailContainerStyle}>
-          <Image
-            style={thumbnailStyle}
-            source={{ uri: thumbnail_image }}
-          />
-        </View>
-        <View style={headerContentStyle}>
-          <Text style={headerTextStyle}>{title}</Text>
-          <Text>{artist}</Text>
-        </View>
-      </CardSection>
-      <CardSection>
-        <View style={headerContentStyle}>
-          <Image
-          style={imageStyle}
-          source={{ uri: image }}
-          />
-        </View>
-      </CardSection>
-      <CardSection>
-        <Button pressButton={() => Linking.openURL(url)}>Buy Now</Button>
-      </CardSection>
-    </Card>
-  );
-};
+import React, { Component } from 'react';
+import { ScrollView } from 'react-native';
+import axios from 'axios';
+import AlbumDetail from './AlbumDetail';
 
-const styles = {
-  headerContentStyle: {
-    flexDirection: 'column',
-    justifyContent: 'space-around',
-    flex: 1
-  },
-  headerTextStyle: {
-    fontSize: 18
-  },
-  thumbnailStyle: {
-    height: 50,
-    width: 50
-  },
-  thumbnailContainerStyle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10
-  },
-  imageStyle: {
-    height: 300,
-    flex: 1,
-    width: null
+class AlbumList extends Component {
+  state = { albums: [] };
+
+  componentWillMount() {
+    axios.get('https://rallycoding.herokuapp.com/api/music_albums')
+      .then(response => this.setState({ albums: response.data }));
   }
-};
 
-export default AlbumDetail;
+  renderAlbums() {
+    return this.state.albums.map(album => 
+      <AlbumDetail key={album.title} album={album} />
+    );
+  }
+  
+  render() {
+    return (
+      <ScrollView>
+        {this.renderAlbums()}
+      </ScrollView>
+    );
+  }
+}
+
+export default AlbumList;
